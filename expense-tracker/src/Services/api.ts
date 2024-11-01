@@ -1,4 +1,4 @@
-const baseUrl = "https://localhost:7071/";
+const baseUrl = "http://expensetrackerws.somee.com/";
 
 const AddExpense = baseUrl + "api/AddExpense";
 const GetExpense = baseUrl + "api/getExpense";

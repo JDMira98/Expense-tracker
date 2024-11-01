@@ -67,7 +67,7 @@ const ExpenseSummary: React.FC<ExpenseSummaryProps> = ({ expenses }) => {
                 className="list-group-item d-flex justify-content-between align-items-center"
               >
                 <span>{category}</span>
-                <span>${amount.toFixed(2)}</span>
+                <span>${(amount as number).toFixed(2)}</span>
               </li>
             ))}
           </ul>
