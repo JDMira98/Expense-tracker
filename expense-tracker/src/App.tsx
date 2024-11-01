@@ -1,3 +1,4 @@
+// App.tsx
 import React, { useState, useEffect } from "react";
 import ExpenseForm from "./Components/ExpenseForm";
 import ExpenseList from "./Components/ExpenseList";
@@ -11,16 +12,17 @@ import {
 } from "./Services/api";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "./Css/App.css"; // Agregar archivo CSS personalizado para ajustes específicos
-import { Expense } from "./Types"; // Importa la interfaz desde types.ts
+import "./Css/App.css";
+import { Expense } from "./Types";
 
 const App: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
-  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
-  const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false); // Estado para el modal de confirmación de eliminación
-  const [expenseToDelete, setExpenseToDelete] = useState<number | null>(null); // ID del gasto a eliminar
+  const [showModal, setShowModal] = useState(false);
+  const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
+  const [expenseToDelete, setExpenseToDelete] = useState<number | null>(null);
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
 
   useEffect(() => {
     fetchExpenses();
@@ -28,67 +30,34 @@ const App: React.FC = () => {
 
   const fetchExpenses = async () => {
     try {
-      const response = await GetExpensesGET(0); // Almacena la respuesta completa
-      console.log("Response:", response); // Verifica la estructura de la respuesta
-
-      // Accede directamente a expenses desde la respuesta
+      const response = await GetExpensesGET(0);
       if (response && response.expenses) {
         const expensesData = response.expenses;
+        setExpenses(expensesData);
+        setFilteredExpenses(expensesData);
 
-        // Verifica que expensesData sea un array
-        if (Array.isArray(expensesData)) {
-          console.log("Expenses data:", expensesData);
-          setExpenses(expensesData);
-          setFilteredExpenses(expensesData);
-
-          const uniqueCategories = Array.from(
-            new Set(expensesData.map((expense: Expense) => expense.category))
-          ) as string[];
-          setCategories(uniqueCategories);
-        } else {
-          console.error("response.expenses is not an array", expensesData);
-        }
-      } else {
-        console.error("Response is undefined or malformed", response);
+        const uniqueCategories = Array.from(
+          new Set(expensesData.map((expense: Expense) => expense.category))
+        ) as string[];
+        setCategories(uniqueCategories);
       }
     } catch (error) {
       console.error("Error fetching expenses:", error);
     }
   };
 
-  const handleAddExpense = async (expense: Omit<Expense, "id">) => {
+  const handleAddExpense = async (expense:Expense) => {
     try {
-      const Addexpense = {
-        id: 0, // La API generará el ID
-        amount: expense.amount,
-        category: expense.category,
-        date: expense.date,
-        description: expense.description,
-      };
-
-      // Realiza la solicitud para agregar el gasto
+      const Addexpense = { ...expense };
       const response = await AddExpensePost(Addexpense);
-
-      // Verifica que la respuesta indique que se ha agregado el gasto exitosamente
       if (response && response.includes("Expense added successfully")) {
-        // Crea el objeto del nuevo gasto manualmente
-        const newExpense: Expense = {
-          id: 0, // Puedes mantenerlo como 0, o ajustarlo en función de la lógica futura
-          amount: expense.amount,
-          category: expense.category,
-          date: expense.date,
-          description: expense.description,
-        };
-
-        // Actualiza los estados
+        const newExpense: Expense = { ...expense };
         setExpenses([...expenses, newExpense]);
         setFilteredExpenses([...filteredExpenses, newExpense]);
         if (!categories.includes(newExpense.category)) {
           setCategories([...categories, newExpense.category]);
         }
-        setShowModal(false); // Cierra el modal después de agregar el gasto
-      } else {
-        console.error("Error adding expense: unexpected response", response);
+        setShowModal(false);
       }
     } catch (error) {
       console.error("Error adding expense:", error);
@@ -97,19 +66,14 @@ const App: React.FC = () => {
 
   const handleEditExpense = async (updatedExpense: Expense) => {
     try {
-      const UpdateExpense = {
-        id: updatedExpense.id, // Ahora se usa el ID del gasto actualizado
-        amount: updatedExpense.amount,
-        category: updatedExpense.category,
-        date: updatedExpense.date,
-        description: updatedExpense.description,
-      };
-      await UpdateExpensePost(UpdateExpense);
+      await UpdateExpensePost(updatedExpense);
       const updatedExpenses = expenses.map((exp) =>
         exp.id === updatedExpense.id ? updatedExpense : exp
       );
       setExpenses(updatedExpenses);
       setFilteredExpenses(updatedExpenses);
+      setShowModal(false);
+      setSelectedExpense(null);
     } catch (error) {
       console.error("Error updating expense:", error);
     }
@@ -129,8 +93,8 @@ const App: React.FC = () => {
   const handleConfirmDelete = async () => {
     if (expenseToDelete !== null) {
       await handleDeleteExpense(expenseToDelete);
-      setShowConfirmDeleteModal(false); // Cierra el modal de confirmación
-      setExpenseToDelete(null); // Resetea el ID del gasto a eliminar
+      setShowConfirmDeleteModal(false);
+      setExpenseToDelete(null);
     }
   };
 
@@ -152,62 +116,64 @@ const App: React.FC = () => {
   return (
     <>
       <div className="container py-4 bg-dark text-light rounded">
-        <h2 className="mb-4 text-center">
-          <i className="bi bi-wallet2"></i> Expense Tracker
-        </h2>
+        <h1 className="mb-4 text-center">
+          <i className="bi bi-wallet2"></i> Gestor de gastos
+        </h1>
 
         <ExpenseSummary expenses={filteredExpenses} />
 
-        {/* Agrupación para centrar el icono y el texto de "Filtros" */}
         <div className="text-center mb-2 mt-4">
-          <h3>
+          <h2>
             <i className="bi bi-funnel-fill text-info"></i> Filtros
-          </h3>
+          </h2>
         </div>
 
         <Filter categories={categories} onFilterChange={handleFilterChange} />
 
-        <h2 className="mt-4">
-          <i className="bi bi-list-ul"></i> Lista de Gastos
-        </h2>
+
         <ExpenseList
           expenses={filteredExpenses}
-          onEdit={handleEditExpense}
+          onEdit={(expense) => {
+            setSelectedExpense(expense); // Abre el modal en modo edición
+            setShowModal(true);
+          }}
           onDelete={(id) => {
-            setExpenseToDelete(id); // Guarda el ID del gasto a eliminar
-            setShowConfirmDeleteModal(true); // Muestra el modal de confirmación
+            setExpenseToDelete(id);
+            setShowConfirmDeleteModal(true);
           }}
         />
 
-        {/* Botón emergente en la parte inferior derecha */}
         <button
           title="Nuevo gasto"
-          className="btn btn-success rounded-circle position-fixed bottom-0 end-0 m-4 d-flex align-items-center justify-content-center"
-          onClick={() => setShowModal(true)} // Abrir modal al hacer clic
+          className="btn btn-dark rounded-circle position-fixed bottom-0 end-0 m-4 d-flex align-items-center justify-content-center"
+          onClick={() => {
+            setSelectedExpense(null);
+            setShowModal(true);
+          }}
           style={{
             width: "60px",
             height: "60px",
             padding: "0",
-            border: "none", // Opcional: eliminar el borde para un aspecto más limpio
-            display: "flex", // Asegúrate de usar flex para centrar
+            border: "none",
+            display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            outline: "none", // Opcional: eliminar el contorno de enfoque
+            outline: "none",
           }}
         >
           <i
             className="bi bi-plus-circle-fill"
-            style={{ fontSize: "2.5rem", margin: "0" }} // Asegúrate de que no haya margen
+            style={{ fontSize: "2.5rem", margin: "0" }}
           ></i>
-          {/* Ajusta el tamaño del ícono */}
         </button>
 
-        {/* Modal para agregar gasto */}
         {showModal && (
           <div className="modal-container" onClick={() => setShowModal(false)}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
-                <h5 className="modal-title">Nuevo Gasto</h5>
+                <h5 className="modal-title">
+                  {selectedExpense ? "Editar Gasto" : "Nuevo Gasto"}
+                </h5>
                 <button
                   type="button"
                   className="plus"
@@ -218,8 +184,11 @@ const App: React.FC = () => {
               </div>
               <div className="modal-body">
                 <ExpenseForm
-                  onSubmit={handleAddExpense}
+                  onSubmit={
+                    selectedExpense ? handleEditExpense : handleAddExpense
+                  }
                   onClose={() => setShowModal(false)}
+                  initialData={selectedExpense}
                 />
               </div>
             </div>

@@ -9,6 +9,10 @@
         display: block;
         text-align: right;
     }
+        .text-start {
+            text-align: left !important;
+            /* Asegura que el texto esté alineado a la izquierda */
+        }
 
     .table th {
         display: none;
@@ -31,4 +35,21 @@
         /* Espacio para el texto */
         text-align: left;
     }
+
+        .list-group-item {
+            border: 1px solid #e0e0e0;
+            /* Borde sutil para cada ítem */
+            border-radius: 8px;
+            /* Bordes redondeados */
+            margin-bottom: 10px;
+            /* Espacio entre los ítems */
+        }
+    
+        .list-group-item:hover {
+            background-color: #f9f9f9;
+            /* Color de fondo al pasar el ratón */
+            transition: background-color 0.3s ease;
+            /* Efecto de transición suave */
+        }
 }
+

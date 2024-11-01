@@ -1,4 +1,6 @@
 import React from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css"; // Asegúrate de importar los estilos de react-datepicker
 
 interface FilterProps {
   categories: string[];
@@ -10,17 +12,19 @@ interface FilterProps {
 
 const Filter: React.FC<FilterProps> = ({ categories, onFilterChange }) => {
   const [selectedCategory, setSelectedCategory] = React.useState("");
-  const [startDate, setStartDate] = React.useState("");
-  const [endDate, setEndDate] = React.useState("");
+  const [startDate, setStartDate] = React.useState<Date | null>(null);
+  const [endDate, setEndDate] = React.useState<Date | null>(null);
 
   const handleFilterChange = () => {
-    onFilterChange(selectedCategory, { start: startDate, end: endDate });
+    const start = startDate ? startDate.toISOString().split("T")[0] : "";
+    const end = endDate ? endDate.toISOString().split("T")[0] : "";
+    onFilterChange(selectedCategory, { start, end });
   };
 
   return (
     <div className="mb-4">
       <div className="mb-3">
-        <label>Categoría</label>
+        <h4>Categoría</h4>
         <select
           className="form-select"
           value={selectedCategory}
@@ -37,21 +41,25 @@ const Filter: React.FC<FilterProps> = ({ categories, onFilterChange }) => {
 
       <div className="row mb-3">
         <div className="col">
-          <label>Desde</label>
-          <input
-            type="date"
+          <h4>Desde: </h4>
+          <DatePicker
             className="form-control"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+            selected={startDate}
+            onChange={(date) => setStartDate(date)}
+            dateFormat="yyyy-MM-dd" // Formato de fecha
+            placeholderText="Seleccionar fecha"
+            isClearable
           />
         </div>
         <div className="col">
-          <label>Hasta</label>
-          <input
-            type="date"
+          <h4>Hasta: </h4>
+          <DatePicker
             className="form-control"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
+            selected={endDate}
+            onChange={(date) => setEndDate(date)}
+            dateFormat="yyyy-MM-dd" // Formato de fecha
+            placeholderText="Seleccionar fecha"
+            isClearable
           />
         </div>
       </div>
