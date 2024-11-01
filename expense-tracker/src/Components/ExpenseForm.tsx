@@ -1,34 +1,37 @@
 import React, { useState } from "react";
-
-export interface Expense {
-  id: string;
-  amount: number;
-  category: string;
-  date: string;
-  description?: string;
-}
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { Expense } from "../Types"; // Importa la interfaz desde types.ts
 
 interface ExpenseFormProps {
   onSubmit: (expense: Omit<Expense, "id">) => void;
   onClose: () => void; // Función para cerrar el modal
+  initialData?: Expense | null; // Datos iniciales par
 }
 
 const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit, onClose }) => {
-  const [amount, setAmount] = useState(0);
-  const [category, setCategory] = useState("");
-  const [date, setDate] = useState("");
-  const [description, setDescription] = useState("");
+  const [amount, setAmount] = useState<number>(0);
+  const [category, setCategory] = useState<string>("");
+  const [date, setDate] = useState<Date | null>(null); // Cambiar el tipo a Date
+  const [description, setDescription] = useState<string>("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ amount, category, date, description });
+
+
+    onSubmit({
+      amount,
+      category,
+      date: date!.toISOString().split("T")[0],
+      description,
+    });
     resetForm();
   };
 
   const resetForm = () => {
     setAmount(0);
     setCategory("");
-    setDate("");
+    setDate(null); // Resetear fecha
     setDescription("");
     onClose(); // Cerrar el modal después de agregar
   };
@@ -36,7 +39,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit, onClose }) => {
   return (
     <div className="modal-container" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h5 className="modal-title">Agregar Nuevo Gasto</h5>
+        <h5 className="modal-title">Gasto</h5>
         <form onSubmit={handleSubmit} className="mb-4">
           <div className="mb-3">
             <label>Monto</label>
@@ -60,12 +63,14 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ onSubmit, onClose }) => {
           </div>
           <div className="mb-3">
             <label>Fecha</label>
-            <input
-              type="date"
+            <DatePicker
               className="form-control"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              selected={date}
+              onChange={(date) => setDate(date)}
+              dateFormat="yyyy/MM/dd"
               required // Agregar validación
+              isClearable
+              placeholderText="Selecciona una fecha"
             />
           </div>
           <div className="mb-3">
