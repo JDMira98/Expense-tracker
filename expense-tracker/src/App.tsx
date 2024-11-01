@@ -1,15 +1,17 @@
-// src/App.tsx
 import React, { useState, useEffect } from "react";
-import ExpenseForm from "./components/ExpenseForm";
-import ExpenseList from "./components/ExpenseList";
-import ExpenseSummary from "./components/ExpenseSummary";
-import Filter from "./components/Filter";
+import ExpenseForm from "./Components/ExpenseForm";
+import ExpenseList from "./Components/ExpenseList";
+import ExpenseSummary from "./Components/ExpenseSummary";
+import Filter from "./Components/Filter";
 import {
   getExpenses,
   addExpense,
   updateExpense,
   deleteExpense,
-} from "./services/api";
+} from "./Services/api";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import "./Css/App.css"; // Agregar archivo CSS personalizado para ajustes específicos
 
 interface Expense {
   id: string;
@@ -23,6 +25,7 @@ const App: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
+  const [showModal, setShowModal] = useState(false); // Estado para controlar el modal
 
   useEffect(() => {
     fetchExpenses();
@@ -33,9 +36,11 @@ const App: React.FC = () => {
       const { data } = await getExpenses();
       setExpenses(data);
       setFilteredExpenses(data);
-      setCategories([
-        ...new Set(data.map((expense: Expense) => expense.category)),
-      ]);
+      setCategories(
+        Array.from(
+          new Set(data.map((expense: Expense) => expense.category))
+        ) as string[]
+      );
     } catch (error) {
       console.error("Error fetching expenses:", error);
     }
@@ -43,12 +48,13 @@ const App: React.FC = () => {
 
   const handleAddExpense = async (expense: Omit<Expense, "id">) => {
     try {
-      const { data } = await addExpense(expense);
+      const { data } = await addExpense(expense as Expense);
       setExpenses([...expenses, data]);
       setFilteredExpenses([...filteredExpenses, data]);
       if (!categories.includes(data.category)) {
         setCategories([...categories, data.category]);
       }
+      setShowModal(false); // Cerrar el modal después de agregar el gasto
     } catch (error) {
       console.error("Error adding expense:", error);
     }
@@ -94,22 +100,78 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="container">
-      <h1 className="my-4">Seguimiento de Gastos</h1>
+    <div className="container py-4 bg-dark text-light rounded">
+      <h2 className="mb-4 text-center">
+        <i className="bi bi-wallet2"></i> Expense Tracker
+      </h2>
+
       <ExpenseSummary expenses={filteredExpenses} />
 
-      <h2 className="mt-4">Agregar Nuevo Gasto</h2>
-      <ExpenseForm onSubmit={handleAddExpense} />
+      {/* Agrupación para centrar el icono y el texto de "Filtros" */}
+      <div className="text-center mb-2 mt-4">
+        <h3>
+          <i className="bi bi-funnel-fill text-info"></i> Filtros
+        </h3>
+      </div>
 
-      <h2 className="mt-4">Filtros</h2>
       <Filter categories={categories} onFilterChange={handleFilterChange} />
 
-      <h2 className="mt-4">Lista de Gastos</h2>
+      <h2 className="mt-4">
+        <i className="bi bi-list-ul"></i> Lista de Gastos
+      </h2>
       <ExpenseList
         expenses={filteredExpenses}
         onEdit={handleEditExpense}
         onDelete={handleDeleteExpense}
       />
+
+      {/* Botón emergente en la parte inferior derecha */}
+      <button
+      title="Nuevo gasto"
+        className="btn btn-success rounded-circle position-fixed bottom-0 end-0 m-4 d-flex align-items-center justify-content-center"
+        onClick={() => setShowModal(true)} // Abrir modal al hacer clic
+        style={{
+          width: "60px",
+          height: "60px",
+          padding: "0",
+          border: "none", // Opcional: eliminar el borde para un aspecto más limpio
+          display: "flex", // Asegúrate de usar flex para centrar
+          alignItems: "center",
+          justifyContent: "center",
+          outline: "none", // Opcional: eliminar el contorno de enfoque
+        }}
+      >
+        <i
+          className="bi bi-plus-circle-fill"
+          style={{ fontSize: "2.5rem", margin: "0" }} // Asegúrate de que no haya margen
+        ></i>{" "}
+        {/* Ajusta el tamaño del ícono */}
+        
+      </button>
+
+      {/* Modal para agregar gasto */}
+      {showModal && (
+        <div className="modal-container" onClick={() => setShowModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h5 className="modal-title">Nuevo Gasto</h5>
+              <button
+                type="button"
+                className="plus"
+                onClick={() => setShowModal(false)}
+              >
+                <span>&times;</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <ExpenseForm
+                onSubmit={handleAddExpense}
+                onClose={() => setShowModal(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

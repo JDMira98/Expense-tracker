@@ -1,0 +1,181 @@
+* {
+  box-sizing: border-box;
+  /* Asegura que el padding y el border se incluyan en el ancho y alto */
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  /* Asegura que el body ocupe el 100% de la altura */
+  background-color: #343a40;
+  /* Color de fondo general */
+  color: #e9ecef;
+  /* Color de texto general */
+}
+
+#root {
+  width: 100%;
+  /* Cambia max-width a width para que ocupe toda la pantalla */
+  padding: 2rem;
+  text-align: center;
+  overflow-x: hidden;
+  /* Evita el desbordamiento horizontal */
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+.container-fluid {
+  background-color: #343a40;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+h2 {
+  color: #ffffff;
+  margin-top: 1.5rem;
+}
+
+.row>.col-md-4,
+.row>.col-md-8 {
+  padding-top: 20px;
+}
+
+.expense-form {
+  background-color: #495057;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.expense-list,
+.filter {
+  background-color: #212529;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.text-light {
+  color: #e9ecef;
+}
+
+.bi {
+  margin-right: 8px;
+}
+
+button {
+  margin-top: 10px;
+}
+
+.d-flex {
+  margin-bottom: 20px;
+}
+
+/* Estilos para el modal */
+.modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  /* Fondo oscuro semi-transparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  /* Asegúrate de que esté encima de otros elementos */
+}
+
+.modal-content {
+  background: #343a40;
+  /* Color de fondo oscuro (bg-dark) */
+  color: white;
+  /* Color de texto blanco */
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  /* Cambia el ancho a un porcentaje */
+  max-width: 400px;
+  /* Limita el ancho máximo */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  /* Línea de separación clara */
+}
+
+.modal-header .close {
+  color: white;
+  /* Color del botón de cerrar */
+}
+
+/* Agrega estilos responsivos */
+@media (max-width: 768px) {
+  #root {
+    padding: 1rem;
+    /* Reduce el padding en dispositivos móviles */
+  }
+
+  .logo {
+    height: 4em;
+    /* Reduce el tamaño del logo en móviles */
+  }
+
+  .expense-form,
+  .expense-list,
+  .filter {
+    padding: 15px;
+    /* Ajusta el padding de formularios y listas */
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    /* Reduce el tamaño de los encabezados */
+  }
+
+  .d-flex {
+    flex-direction: column;
+    /* Cambia a columna en móviles */
+    align-items: flex-start;
+    /* Alinea elementos a la izquierda */
+  }
+}

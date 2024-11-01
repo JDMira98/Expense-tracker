@@ -1,4 +1,3 @@
-// src/components/Filter.tsx
 import React from "react";
 
 interface FilterProps {
@@ -35,24 +34,28 @@ const Filter: React.FC<FilterProps> = ({ categories, onFilterChange }) => {
           ))}
         </select>
       </div>
-      <div className="mb-3">
-        <label>Desde</label>
-        <input
-          type="date"
-          className="form-control"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
+
+      <div className="row mb-3">
+        <div className="col">
+          <label>Desde</label>
+          <input
+            type="date"
+            className="form-control"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+        </div>
+        <div className="col">
+          <label>Hasta</label>
+          <input
+            type="date"
+            className="form-control"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+        </div>
       </div>
-      <div className="mb-3">
-        <label>Hasta</label>
-        <input
-          type="date"
-          className="form-control"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-        />
-      </div>
+
       <button className="btn btn-primary" onClick={handleFilterChange}>
         Aplicar Filtros
       </button>

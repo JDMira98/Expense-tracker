@@ -1,5 +1,12 @@
 import axios from "axios";
 
+export interface Expense {
+  id: string;
+  amount: number;
+  category: string;
+  date: string;
+  description?: string;
+}
 const api = axios.create({
   baseURL: "https://tuapi.com/gastos", // Cambia la URL según tu API
 });
